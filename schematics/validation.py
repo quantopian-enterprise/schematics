@@ -14,6 +14,7 @@ def _is_empty(field_value):
         return True
     return False
 
+MISSING = object()
 
 def validate(cls, values, partial=False, report_rogues=False):
     ### Reject model if _fields isn't present
@@ -37,12 +38,18 @@ def validate(cls, values, partial=False, report_rogues=False):
             try:
                 field_value = values[field_name]
             except KeyError:
-                field_value = None
+                field_value = MISSING
 
             ### TODO - this will be the new validation system soon
-            if _is_empty(field_value):
+            if field_value is MISSING:
                 if field.required:
                     error_msg = "Required field (%s) not found" % field_name
+                    errors.append(error_msg)
+                continue
+
+            elif _is_empty(field_value):
+                if not field.allow_empty and field.required:
+                    error_msg = "Empty value found for (%s)." % field_name
                     errors.append(error_msg)
                 continue
 
