@@ -68,7 +68,7 @@ def validate(cls, values, partial=False, report_rogues=False):
         rogues_found = set(values.keys()) - set(class_fields)
         if len(rogues_found) > 0:
             for field_name in rogues_found:
-                error_msg = 'Unknown field found'
+                error_msg = 'Unknown field found %s' % field_name
                 field_value = values[field_name]
                 errors.append(error_msg)
 
