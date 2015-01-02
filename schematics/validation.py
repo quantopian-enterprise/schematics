@@ -51,6 +51,7 @@ def validate(cls, values, partial=False, report_rogues=False):
                 if not field.allow_empty and field.required:
                     error_msg = "Empty value found for (%s)." % field_name
                     errors.append(error_msg)
+                new_data[field_name] = field_value
                 continue
 
             ### Validate field value via call to BaseType._validate
