@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import absolute_import
 import unittest
 from schematics.models import Model
 from schematics.validation import validate

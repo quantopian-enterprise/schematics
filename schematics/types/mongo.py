@@ -2,10 +2,12 @@
 as part of the pymongo distribution.
 """
 
+from __future__ import absolute_import
 from schematics.types import BaseType
 from schematics.exceptions import ValidationError
 
 import bson
+import six
 
 
 class ObjectIdType(BaseType):
@@ -27,8 +29,8 @@ class ObjectIdType(BaseType):
         if not value and self.auto_fill is True:
             value = bson.objectid.ObjectId()
 
-        if isinstance(value, (str, unicode)):
-            value = bson.objectid.ObjectId(unicode(value))
+        if isinstance(value, (str, six.text_type)):
+            value = bson.objectid.ObjectId(six.text_type(value))
 
         instance._data[self.field_name] = value
 
@@ -37,8 +39,8 @@ class ObjectIdType(BaseType):
 
     def for_python(self, value):
         try:
-            return bson.objectid.ObjectId(unicode(value))
-        except Exception, e:
+            return bson.objectid.ObjectId(six.text_type(value))
+        except Exception as e:
             raise ValidationError('Invalid ObjectId')
 
     def for_json(self, value):
@@ -47,7 +49,7 @@ class ObjectIdType(BaseType):
     def validate(self, value):
         if not isinstance(value, bson.objectid.ObjectId):
             try:
-                value = bson.objectid.ObjectId(unicode(value))
-            except Exception, e:
+                value = bson.objectid.ObjectId(six.text_type(value))
+            except Exception as e:
                 raise ValidationError('Invalid ObjectId')
         return True

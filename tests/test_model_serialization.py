@@ -5,6 +5,7 @@
 """
 
 
+from __future__ import absolute_import
 import unittest
 import json
 import datetime
@@ -14,8 +15,8 @@ from schematics.base import json
 from schematics.models import Model
 from schematics.serialize import to_jsonschema, from_jsonschema
 
-import fixtures
-from fixtures import SimpleModel
+from . import fixtures
+from .fixtures import SimpleModel
 
 
 class FixtureMixin():

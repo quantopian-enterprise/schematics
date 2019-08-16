@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import uuid
 import re
 import datetime
@@ -6,6 +7,8 @@ import decimal
 
 from schematics.exceptions import ValidationError
 from schematics.types import schematic_types
+import six
+from six.moves import filter
 
 
 class BaseTypeMetaClass(type):
@@ -21,12 +24,10 @@ class BaseTypeMetaClass(type):
 ### Base Type
 ###
 
-class BaseType(object):
+class BaseType(six.with_metaclass(BaseTypeMetaClass, object)):
     """A base class for Types in a Schematics model. Instances of this
     class may be added to subclasses of `Model` to define a model schema.
     """
-
-    __metaclass__ = BaseTypeMetaClass
 
     def __init__(self, required=False, default=None, field_name=None,
                  print_name=None, choices=None, validation=None, description=None,
@@ -97,7 +98,7 @@ class BaseType(object):
         # `choices`
         if self.choices is not None:
             if value not in self.choices:
-                error_msg = 'Value must be one of %s.' % unicode(self.choices)
+                error_msg = 'Value must be one of %s.' % six.text_type(self.choices)
                 raise ValidationError(error_msg)
 
         # `validation` function
@@ -279,10 +280,10 @@ class StringType(BaseType):
     def for_python(self, value):
         if value is None:
             return None
-        return unicode(value)
+        return six.text_type(value)
 
     def validate(self, value):
-        if not isinstance(value, (str, unicode)):
+        if not isinstance(value, (str, six.text_type)):
             raise ValidationError('Not a boolean')
 
         if self.max_length is not None and len(value) > self.max_length:
@@ -337,10 +338,10 @@ class URLType(StringType):
             raise ValidationError('Invalid URL')
 
         if self.verify_exists:
-            import urllib2
+            import six.moves.urllib.request, six.moves.urllib.error, six.moves.urllib.parse
             try:
-                request = urllib2.Request(value)
-                urllib2.urlopen(request)
+                request = six.moves.urllib.request.Request(value)
+                six.moves.urllib.request.urlopen(request)
             except Exception:
                 raise ValidationError('URL does not exist')
         return True
@@ -459,7 +460,7 @@ class LongType(NumberType):
     """A field that validates input as a Long
     """
     def __init__(self, *args, **kwargs):
-        super(LongType, self).__init__(number_class=long,
+        super(LongType, self).__init__(number_class=int,
                                         number_type='Long',
                                         *args, **kwargs)
 
@@ -482,16 +483,16 @@ class DecimalType(BaseType, JsonNumberMixin):
         super(DecimalType, self).__init__(**kwargs)
 
     def for_python(self, value):
-        if not isinstance(value, basestring):
-            value = unicode(value)
+        if not isinstance(value, six.string_types):
+            value = six.text_type(value)
         return decimal.Decimal(value)
 
     def for_json(self, value):
-        return unicode(value)
+        return six.text_type(value)
 
     def validate(self, value):
         if not isinstance(value, decimal.Decimal):
-            if not isinstance(value, basestring):
+            if not isinstance(value, six.string_types):
                 value = str(value)
             try:
                 value = decimal.Decimal(value)
@@ -583,7 +584,7 @@ class BooleanType(BaseType):
         """
         Accept some form of True/False as string
         """
-        if isinstance(value, (str, unicode)):
+        if isinstance(value, (str, six.text_type)):
             if value in BooleanType.TRUE:
                 value = True
             elif value in BooleanType.FALSE:
@@ -636,7 +637,7 @@ class DateTimeType(BaseType):
 
         A datetime may be used (and is encouraged).
         """
-        if isinstance(value, (str, unicode)):
+        if isinstance(value, (str, six.text_type)):
             value = DateTimeType.iso8601_to_date(value)
 
         instance._data[self.field_name] = value

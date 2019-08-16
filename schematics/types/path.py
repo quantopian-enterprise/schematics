@@ -1,8 +1,10 @@
+from __future__ import absolute_import
 import os
 from os import path
 
 from schematics.types import StringType
 from schematics.exceptions import ValidationError
+import six
 
 
 class PathType(StringType):
@@ -30,7 +32,7 @@ class PathType(StringType):
         self.can_create_or_write = can_create_or_write
 
     def validate(self, value):
-        if not isinstance(value, basestring):
+        if not isinstance(value, six.string_types):
             raise ValidationError("value must be a string")
 
         realpath = path.realpath(value)

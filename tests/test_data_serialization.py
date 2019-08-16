@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 
+from __future__ import absolute_import
 import unittest
 import json
 import datetime
@@ -10,8 +11,8 @@ from schematics.models import Model
 from schematics.serialize import (to_python, to_json, make_safe_python,
                                   make_safe_json)
 
-import fixtures
-from fixtures import Model
+from . import fixtures
+from .fixtures import Model
 
 
 class ModelSerializer:

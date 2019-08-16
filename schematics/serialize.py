@@ -68,12 +68,14 @@ That looks like this in code:
             }        
 """
 
+from __future__ import absolute_import
 import copy
 import collections
 
 from schematics.types import schematic_types
 from schematics.base import json
 from schematics.models import Model
+import six
 
 
 ###
@@ -315,7 +317,7 @@ def from_jsonschema(schema, model=Model):
 
     if 'properties' in schema:
         model_fields = {}
-        for field_name, schema_field in schema['properties'].iteritems():
+        for field_name, schema_field in six.iteritems(schema['properties']):
             field = map_jsonschema_field_to_schematics(schema_field, model)
             model_fields[field_name] = field
         clss = type(str(class_name), (model,), model_fields)

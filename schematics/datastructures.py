@@ -1,4 +1,6 @@
+from __future__ import absolute_import
 import copy
+import six
 
 
 '''
@@ -149,11 +151,11 @@ class MultiValueDict(dict):
 
     def lists(self):
         """Returns a list of (key, list) pairs."""
-        return super(MultiValueDict, self).items()
+        return list(super(MultiValueDict, self).items())
 
     def iterlists(self):
         """Yields (key, list) pairs."""
-        return super(MultiValueDict, self).iteritems()
+        return six.iteritems(super(MultiValueDict, self))
 
     def values(self):
         """Returns a list of the last value on every key list."""
@@ -161,7 +163,7 @@ class MultiValueDict(dict):
 
     def itervalues(self):
         """Yield the last value on every key list."""
-        for key in self.iterkeys():
+        for key in six.iterkeys(self):
             yield self[key]
 
     def copy(self):
@@ -190,7 +192,7 @@ class MultiValueDict(dict):
                     error_msg = "MultiValueDict.update() takes either a " \
                                 "MultiValueDict or dictionary"
                     raise ValueError(error_msg)
-        for key, value in kwargs.iteritems():
+        for key, value in six.iteritems(kwargs):
             self.setlistdefault(key, []).append(value)
 
     def dict(self):

@@ -1,3 +1,4 @@
+import six
 class ValidationError(ValueError):
     """Exception raised when invalid data is encountered."""
 
@@ -11,7 +12,7 @@ class ValidationError(ValueError):
     def to_primary(self, messages):
         if isinstance(messages, dict):
             msgs_ = {}
-            for index, errors in messages.iteritems():
+            for index, errors in six.iteritems(messages):
                 # Expand values to primary
                 for msg in self.to_primary(errors):
                     msgs_.setdefault(index, []).extend(msg)

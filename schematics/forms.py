@@ -48,6 +48,7 @@ Using it looks a bit like this:
 """
 
 
+from __future__ import absolute_import
 from schematics.types.base import BaseType
 
 

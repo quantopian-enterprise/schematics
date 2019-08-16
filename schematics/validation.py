@@ -1,7 +1,9 @@
 """
 """
 
-from exceptions import ValidationError
+from __future__ import absolute_import
+from .exceptions import ValidationError
+import six
 
 
 def _is_empty(field_value):
@@ -9,7 +11,7 @@ def _is_empty(field_value):
     if field_value is None:
         return True
     # treat empty strings as empty values and skip
-    if isinstance(field_value, (str, unicode)) and \
+    if isinstance(field_value, (str, six.text_type)) and \
            len(field_value.strip()) == 0:
         return True
     return False
@@ -60,12 +62,12 @@ def validate(cls, values, partial=False, report_rogues=False):
                 ### TODO clean this
                 result = field.for_python(field_value)
                 new_data[field_name] = result
-            except ValidationError, ve:
+            except ValidationError as ve:
                 errors.append(ve.messages)
 
     ### Report rogue fields as errors if `report_rogues`
     if report_rogues:
-        class_fields = cls._fields.keys()
+        class_fields = list(cls._fields.keys())
         rogues_found = set(values.keys()) - set(class_fields)
         if len(rogues_found) > 0:
             for field_name in rogues_found:

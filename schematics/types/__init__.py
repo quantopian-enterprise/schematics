@@ -3,6 +3,7 @@ the contents of `base.py` but it's possible the fields will be broken out into
 more specific modules as they grow.
 """
 
+from __future__ import absolute_import
 schematic_types = {}
 
 

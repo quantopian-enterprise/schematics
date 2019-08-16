@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import inspect
 import copy
 
@@ -6,6 +7,7 @@ from schematics.base import json
 from schematics.types import (DictFieldNotFound, schematic_types, BaseType,
                               UUIDType)
 from schematics.validation import validate
+import six
 
 
 ###
@@ -105,7 +107,7 @@ class ModelMetaclass(type):
 
     def __str__(self):
         if hasattr(self, '__unicode__'):
-            return unicode(self).encode('utf-8')
+            return six.text_type(self).encode('utf-8')
         return '%s object' % self.__class__.__name__
 
 
@@ -113,8 +115,7 @@ class ModelMetaclass(type):
 ### Model schematics
 ###
 
-class Model(object):
-    __metaclass__ = ModelMetaclass
+class Model(six.with_metaclass(ModelMetaclass, object)):
     __optionsclass__ = ModelOptions
 
     def __init__(self, **values):
@@ -187,12 +188,12 @@ class Model(object):
 
     def __repr__(self):
         try:
-            u = unicode(self)
+            u = six.text_type(self)
         except (UnicodeEncodeError, UnicodeDecodeError):
             u = '[Bad Unicode data]'
         return u"<%s: %s>" % (self.__class__.__name__, u)
 
     def __str__(self):
         if hasattr(self, '__unicode__'):
-            return unicode(self).encode('utf-8')
+            return six.text_type(self).encode('utf-8')
         return '%s object' % self.__class__.__name__

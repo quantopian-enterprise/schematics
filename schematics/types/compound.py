@@ -1,7 +1,11 @@
+from __future__ import absolute_import
+import six
+from six.moves import filter
+from six.moves import filterfalse
 try:
     from itertools import filterfalse  # python3 wutwut
 except:
-    from itertools import ifilterfalse
+    
 from operator import itemgetter
 
 from schematics.models import Model
@@ -42,14 +46,14 @@ class ListType(BaseType):
             raise ValidationError(error_msg)
         
         ### some bad stuff in the list
-        elif list(ifilterfalse(is_basetype, fields)):
+        elif list(filterfalse(is_basetype, fields)):
             error_msg = 'Argument to ListType constructor must be '
             error_msg = error_msg + 'a valid field or list of valid fields'
             raise ValidationError(error_msg)
         
         else:
-            models = filter(is_model, fields)
-            dicts = filter(is_dicttype, fields)
+            models = list(filter(is_model, fields))
+            dicts = list(filter(is_dicttype, fields))
             if dicts:
                 kwargs.setdefault('primary_embedded', None)
             if models:
@@ -66,7 +70,7 @@ class ListType(BaseType):
         new_value = value_list
 
         is_model = lambda tipe: isinstance(tipe, ModelType)
-        model_fields = filter(is_model, self.fields)
+        model_fields = list(filter(is_model, self.fields))
         
         if self.primary_embedded:
             model_fields.remove(self.primary_embedded)
@@ -85,13 +89,13 @@ class ListType(BaseType):
                 ### Extract field names from datum
                 datum_fields = None
                 if isinstance(datum, dict):
-                    datum_fields = datum.keys()
+                    datum_fields = list(datum.keys())
                 else:
-                    datum_fields = datum._fields.keys()
+                    datum_fields = list(datum._fields.keys())
                     
                 ### Determine matching model
                 for model_field in model_fields:
-                    test_keys = model_field.model_type_obj._fields.keys()
+                    test_keys = list(model_field.model_type_obj._fields.keys())
 
                     if len(set(datum_fields) - set(test_keys)) == 0:
                         if datum is None:
@@ -104,7 +108,7 @@ class ListType(BaseType):
                 try:
                     result = datum_instance.validate()
                     new_data.append(datum_instance)
-                except ValidationError, ve:
+                except ValidationError as ve:
                     errors_found = True
                     
             new_value = new_data
@@ -163,7 +167,7 @@ class ListType(BaseType):
                     field.validate(item)
                     value = field.for_python(item)
                     good_data.append(value)
-                except ValidationError, ve:
+                except ValidationError as ve:
                     errors.append(ve)
 
         if len(errors) > 0:
@@ -191,7 +195,7 @@ class SortedListType(ListType):
     _ordering = None
 
     def __init__(self, field, **kwargs):
-        if 'ordering' in kwargs.keys():
+        if 'ordering' in list(kwargs.keys()):
             self._ordering = kwargs.pop('ordering')
         super(SortedListType, self).__init__(field, **kwargs)
 
@@ -225,7 +229,7 @@ class ModelType(BaseType):
     """
     def __init__(self, model_type, **kwargs):
         is_embeddable = lambda dt: issubclass(dt, Model)
-        if not isinstance(model_type, basestring):
+        if not isinstance(model_type, six.string_types):
             if not model_type or not is_embeddable(model_type):
                 error_msg = 'Invalid model class provided to an ModelType'
                 raise ValidationError(error_msg)
@@ -241,7 +245,7 @@ class ModelType(BaseType):
 
     @property
     def model_type(self):
-        if isinstance(self.model_type_obj, basestring):
+        if isinstance(self.model_type_obj, six.string_types):
             if self.model_type_obj == RECURSIVE_REFERENCE_CONSTANT:
                 self.model_type_obj = self.owner_model
             else:
