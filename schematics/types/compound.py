@@ -1,10 +1,6 @@
 from __future__ import absolute_import
 import six
-from six.moves import filter
-from six.moves import filterfalse
-try:
-    from itertools import filterfalse  # python3 wutwut
-except:
+from six.moves import filter, filterfalse
     
 from operator import itemgetter
 
