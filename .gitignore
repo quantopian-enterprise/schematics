@@ -1,0 +1,12 @@
+.DS_Store
+*.pyc
+*.bak
+*.swp
+*.*~
+.ropeproject
+./#*
+MANIFEST
+build
+dist
+PLANS.md
+*.egg-info
